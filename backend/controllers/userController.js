@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(req.user.userId).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json({
@@ -17,7 +17,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const { name, email, password } = req.body;
@@ -27,7 +27,11 @@ exports.updateProfile = async (req, res) => {
     if (password) user.password = password;
 
     await user.save();
-    res.json({ message: "Profile updated successfully", user });
+    
+    const updatedUser = user.toObject();
+    delete updatedUser.password;
+
+    res.json({ message: "Profile updated successfully", user: updatedUser });
   } catch (err) {
     console.error("Update Profile Error:", err.message);
     res.status(500).json({ message: "Server Error" });

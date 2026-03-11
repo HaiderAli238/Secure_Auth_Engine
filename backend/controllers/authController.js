@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
 
     res.status(201).json({
       message: "User registered successfully. OTP sent!",
-      user: { email: user.email, otp: user.otp }
+      user: { email: user.email } 
     });
   } catch (err) {
     console.error("Register Error:", err.message);
@@ -52,10 +52,10 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    await User.updateOne(
-      { _id: user._id },
-      { $set: { isVerified: true }, $unset: { otp: 1, otpExpires: 1 } }
-    );
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
 
     res.json({ message: "Email verified successfully" });
   } catch (err) {

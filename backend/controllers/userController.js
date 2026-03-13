@@ -2,38 +2,36 @@ const User = require("../models/User");
 
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // req.user._id wo ID hai jo authMiddleware ne token verify karke nikaali thi
+    const user = await User.findById(req.user._id).select("-password");
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
-    res.json({
+    res.status(200).json({
       success: true,
-      user
+      user: user
     });
   } catch (err) {
     console.error("Profile Error:", err.message);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
 exports.updateProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const { name, email, password } = req.body;
-
     if (name) user.name = name;
     if (email) user.email = email;
-    if (password) user.password = password;
+    if (password) user.password = password; // Only if you want to allow changing password from profile
 
     await user.save();
-    
-    const updatedUser = user.toObject();
-    delete updatedUser.password;
-
-    res.json({ message: "Profile updated successfully", user: updatedUser });
+    res.json({ success: true, message: "Profile updated successfully", user });
   } catch (err) {
-    console.error("Update Profile Error:", err.message);
     res.status(500).json({ message: "Server Error" });
   }
 };
@@ -49,10 +47,8 @@ exports.getAllUsers = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    res.json({ message: "User deleted successfully" });
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "User deleted" });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }

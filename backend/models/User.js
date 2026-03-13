@@ -11,15 +11,20 @@ const userSchema = new mongoose.Schema(
     otp: { type: String },
     otpExpires: { type: Date },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+// PASSWORD HASHING (Modern Async Way - No 'next' parameter)
+userSchema.pre("save", async function () {
+  // Agar password change nahi hua, to yahan se wapas chale jao
+  if (!this.isModified("password")) return;
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  } catch (error) {
+    throw error;
+  }
 });
 
 userSchema.methods.comparePassword = async function (password) {

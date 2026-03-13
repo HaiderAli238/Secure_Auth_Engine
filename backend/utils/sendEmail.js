@@ -10,7 +10,7 @@ const sendEmail = async (options) => {
   });
 
   const mailOptions = {
-    from: `"IronPulse 🔥" <${process.env.EMAIL_USERNAME}>`,
+    from: `"IronPulse" <${process.env.EMAIL_USERNAME}>`,
     to: options.email,
     subject: options.subject,
     text: options.message

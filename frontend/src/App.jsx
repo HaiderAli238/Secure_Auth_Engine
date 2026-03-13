@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -7,6 +12,8 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/protectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -22,16 +29,16 @@ function App() {
   return (
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <Routes>
-        <Route 
-          path="/login" 
-          element={token ? <Navigate to="/dashboard" /> : <Login />} 
+        <Route
+          path="/login"
+          element={token ? <Navigate to="/dashboard" /> : <Login />}
         />
 
-        <Route 
-          path="/register" 
-          element={token ? <Navigate to="/dashboard" /> : <Register />} 
+        <Route
+          path="/register"
+          element={token ? <Navigate to="/dashboard" /> : <Register />}
         />
 
         <Route
@@ -51,6 +58,20 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route 
+          path="/forgot-password" 
+          element={
+              <ForgotPassword />
+            } 
+          />
+
+        <Route 
+          path="/reset-password"
+          element={
+              <ResetPassword />            
+            } 
+          />
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
